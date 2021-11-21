@@ -2,7 +2,7 @@
 
 ## Division of Tasks
 ### Bernice Betito
-- [ ] <>
+- [ ] GUI
 
 ### Methuselah De la Cerna
 - [ ] <>
