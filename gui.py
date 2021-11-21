@@ -1,4 +1,4 @@
-import pygame, random, math
+import pygame, os, math
 
 n = 8
 max_pits = n * 0.25
@@ -7,6 +7,7 @@ max_beacons = n * 0.1
 def main():
     pygame.init()
     screen = pygame.display.set_mode((640, 480))
+    pygame.display.set_caption('MCO1: Miner')
     done = False
 
     font_main = pygame.font.SysFont(None, 50)
@@ -15,14 +16,19 @@ def main():
     text_sub = font_sub.render("Group 42 - CSINTSY", True, (102, 102, 102))
 
     font_icons = pygame.font.SysFont(None, 35)
-    miner_icon = font_icons.render("M", True, (201, 124, 93))
     pits_icons = font_icons.render("P", True, (120, 85, 137))
     beacons_icons = font_icons.render("B", True, (73, 109, 219))
-    gold_icon = font_icons.render("G", True, (244, 232, 124))
 
     gold = [4, 4]
     pits = {1: [2, 4], 2: [6, 6]}
     beacons = {1: [4, 2]}
+
+    directory = os.getcwd()
+    miner_icon = pygame.image.load(directory + r'\assets\miner_icon.png')
+    miner_icon = pygame.transform.scale(miner_icon, (25, 25))
+
+    gold_icon = pygame.image.load(directory + r'\assets\gold_icon.png')
+    gold_icon = pygame.transform.scale(gold_icon, (25, 25))
 
     font_direction = pygame.font.SysFont(None, 30)
     curr_direction = font_direction.render("Current Direction: East", True, (240, 246, 246))
@@ -36,10 +42,6 @@ def main():
             if event.type == pygame.QUIT:
                 done = True
         screen.fill((25, 25, 25))
-
-        pygame.init()
-        screen = pygame.display.set_mode((640, 480))
-        done = False
 
         while not done:
             for event in pygame.event.get():
