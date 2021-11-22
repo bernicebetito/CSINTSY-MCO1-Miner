@@ -36,7 +36,7 @@ def searchLeft(grid, currentRow, currentCol):
     
     return False
 
-def generateGrid(gridNumber):
+def generateGrid(gridNumber): # generate grid blueprint
     pits = math.floor(gridNumber * 0.25)
     beacons = math.floor(gridNumber * 0.1)
 
