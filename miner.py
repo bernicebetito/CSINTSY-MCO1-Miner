@@ -4,8 +4,8 @@ class Miner():
         self.position = (0, 0) # default 0,0
         self.direction = direction # UP, DOWN, LEFT or RIGHT
         self.actions = 0 # miner action count
-        self.dead = False # if miner has moved into a pit
-        self.victor = False # if miner has reached pot of gold
+        self.isDead = False # if miner has moved into a pit
+        self.isVictor = False # if miner has reached pot of gold
 
     def getPosition(self):
         return self.position
@@ -13,29 +13,46 @@ class Miner():
     def getDirection(self):
         return self.direction
 
-    def getMinerStatusDeath(self):
-        return self.dead
+    def getActions(self):
+        return self.actions
 
-    def getMinerStatusVictor(self):
-        return self.victor
+    def ifDead(self):
+        return self.isDead
 
-    def setPosition(self, positionX, positionY):
-        self.position = (positionX, positionY)
-        self.actions += 1
-        
-    def rotateDirection(self):
+    def ifVictor(self):
+        return self.isVictor
+
+    def moveMiner(self):
         if self.direction == "UP":
-            self.direction = "LEFT"
+            self.position[1] -= 1
 
-        elif self.direction == "LEFT":
+        elif self.direction == "RIGHT":
+            self.position[0] += 1
+
+        elif self.direction == "DOWN":
+            self.position[1] += 1
+        
+        else: # direction == LEFT
+            self.position[0] -= 1
+
+        self.incrementActions()
+        
+    def rotateDirection(self): # rotate 90 degrees clockwise
+        if self.direction == "UP":
+            self.direction = "RIGHT"
+
+        elif self.direction == "RIGHT":
             self.direction == "DOWN"
 
         elif self.direction == "DOWN":
-            self.direction == "RIGHT"
+            self.direction == "LEFT"
         
-        else: # direction = RIGHT
+        else: # direction == LEFT
             self.direction == "UP"
 
+        self.incrementActions()
+
+    def incrementActions(self):
         self.actions += 1
 
     def setMinerDeath(self):
