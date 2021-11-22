@@ -1,5 +1,6 @@
 import miner, gridSquare, random, math
 
+# searching for gold for beacon placement
 def searchTop(grid, currentRow, currentCol):
     tempRow = currentRow - 1
     while tempRow >= 0:
