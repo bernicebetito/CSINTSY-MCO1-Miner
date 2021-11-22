@@ -128,7 +128,12 @@ def generateGridSquares(grid): # returns a grid of gridSquare class elements usi
     for rows in grid:
         column = []
         for columns in rows:
-            gridElement = gridSquare.gridSquare(columns)
+            if columns == "MINER":
+                gridElement = miner.Miner("RIGHT")
+                
+            else:
+                gridElement = gridSquare.gridSquare(columns)
+
             column.append(gridElement)
 
         trueGrid.append(column)

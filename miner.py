@@ -7,6 +7,9 @@ class Miner():
         self.isDead = False # if miner has moved into a pit
         self.isVictor = False # if miner has reached pot of gold
 
+    def getContent(self):
+        return "MINER"
+
     def getPosition(self):
         return self.position
 
