@@ -37,15 +37,16 @@ def searchLeft(grid, currentRow, currentCol):
     return False
 
 def generateGrid(gridNumber): # generate grid blueprint
-    pits = math.floor(gridNumber * 0.25)
-    beacons = math.floor(gridNumber * 0.1)
+    pits = math.ceil(gridNumber * 0.25)
+    beacons = math.ceil(gridNumber * 0.1)
 
-    samplingList = ["PIT", "GOLD", "EMPTY"]
+    # samplingList = ["PIT", "GOLD", "EMPTY"]
     counts = {"PIT" : 0, "BEACON" : 0, "GOLD" : 0, "EMPTY": 0}
     maxcounts = {"PIT" : pits, "BEACON" : beacons, "GOLD" : 1, "EMPTY": 999999}
 
     grid = []
 
+    # place miner and fill in grid with empty elements
     for rows in range(gridNumber):
         column = []
 
@@ -54,18 +55,30 @@ def generateGrid(gridNumber): # generate grid blueprint
                 column.append("MINER")
                 continue
 
-            sample = random.sample(samplingList, 1)
-
-            if counts[sample[0]] < maxcounts[sample[0]]:
-                column.append(sample[0])
-                counts[sample[0]] += 1
-
-            else:
-                column.append("EMPTY")
+            column.append("EMPTY")
 
         grid.append(column)
 
-    while counts["BEACON"] <= maxcounts["BEACON"]:
+    # replace some empty elements with pits
+    while counts["PIT"] < maxcounts["PIT"]:
+        randRow = random.randint(0, gridNumber - 1)
+        randCol = random.randint(0, gridNumber - 1)
+
+        if grid[randRow][randCol] == "EMPTY":
+            grid[randRow][randCol] = "PIT"
+            counts["PIT"] += 1
+
+    # place gold
+    while counts["GOLD"] < maxcounts["GOLD"]:
+        randRow = random.randint(0, gridNumber - 1)
+        randCol = random.randint(0, gridNumber - 1)
+
+        if grid[randRow][randCol] == "EMPTY":
+                grid[randRow][randCol] = "GOLD"
+                counts["GOLD"] += 1
+
+    # place beacons
+    while counts["BEACON"] < maxcounts["BEACON"]:
         randRow = random.randint(0, gridNumber - 1)
         randCol = random.randint(0, gridNumber - 1)
 
@@ -121,7 +134,7 @@ def generateGridSquares(grid): # returns a grid of gridSquare class elements usi
     
     return trueGrid
 
-grid = generateGrid(16)
+grid = generateGrid(8)
 for column in grid:
     print(column)
 
