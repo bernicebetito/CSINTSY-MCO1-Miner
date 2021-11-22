@@ -109,7 +109,7 @@ def generateGrid(gridNumber):
 
     return grid
 
-def generateGridSquares(grid): # replaces grid elements with gridSquare class elements
+def generateGridSquares(grid): # returns a grid of gridSquare class elements using a grid blueprint
     trueGrid = []
     for rows in grid:
         column = []
