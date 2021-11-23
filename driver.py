@@ -161,43 +161,30 @@ def miner_screen(n_str, random_status, smart_status):
 
     done = False
 
-    """
-    51 - 64 = 7 7 2
-    41 - 50 = 8 8 3
-    31 - 40 = 10 10 4
-    26 - 30 = 14 14 5
-    21 - 25 = 18 18 5
-    16 - 20 = 23 23 5
-    11 - 15 = 30 30 7
-    10 <= 35 35 7
-    """
-
     box_size = 7
     box_margin = 2
 
-    if n <= 50 and n >= 41:
+    if 50 >= n >= 41:
         box_size = 8
         box_margin = 3
-    elif n <= 40 and n >= 31:
+    elif 40 >= n >= 31:
         box_size = 10
         box_margin = 4
-    elif n <= 30 and n >= 26:
+    elif 30 >= n >= 26:
         box_size = 14
         box_margin = 5
-    elif n <= 25 and n >= 21:
+    elif 25 >= n >= 21:
         box_size = 18
         box_margin = 5
-    elif n <= 20 and n >= 16:
+    elif 20 >= n >= 16:
         box_size = 23
         box_margin = 5
-    elif n <= 15 and n >= 11:
+    elif 15 >= n >= 11:
         box_size = 30
         box_margin = 7
     elif n <= 10:
         box_size = 35
         box_margin = 7
-
-    font_icons = pygame.font.SysFont(None, box_size)
 
     directory = os.getcwd()
     miner_icon = pygame.image.load(directory + r'\assets\miner_icon.png')
@@ -212,41 +199,128 @@ def miner_screen(n_str, random_status, smart_status):
     beacon_icon = pygame.image.load(directory + r'\assets\beacon_icon.png')
     beacon_icon = pygame.transform.scale(beacon_icon, (box_size, box_size))
 
-    font_direction = pygame.font.SysFont(None, 30)
-    curr_direction = font_direction.render("Current Direction: East", True, (240, 246, 246))
+    font_dashboard = pygame.font.SysFont(None, 30)
+    curr_direction = font_dashboard.render("Current Direction:", True, (240, 246, 246))
+
+    ctr_header = font_dashboard.render("Counters", True, (240, 246, 246))
+    rotate_ctr = font_dashboard.render("Rotate: ", True, (240, 246, 246))
+    scan_ctr = font_dashboard.render("Scan: ", True, (240, 246, 246))
+    move_ctr = font_dashboard.render("Move: ", True, (240, 246, 246))
+
+    dash_margin = (n * (box_size + box_margin) + (320 - ((box_margin + box_size) * n) // 2))
+    dash_margin = (1024 + dash_margin) / 2
+
+    rotate_height = text_main.get_height() + text_sub.get_height() + curr_direction.get_height() + ctr_header.get_height()
+    scan_height = rotate_height + rotate_ctr.get_height()
+    move_height = scan_height + scan_ctr.get_height()
+    pace_height = move_height + move_ctr.get_height()
+
+    pace_header = font_dashboard.render("Choose Pace:", True, (240, 246, 246))
+    pace_step = "Step by Step"
+    step_rect = pygame.Rect(
+        dash_margin - 285 // 2,
+        pace_height + 500 // 2,
+        130, 30
+    )
+
+    pace_fast = "Fast"
+    fast_rect = pygame.Rect(
+        dash_margin + 25 // 2,
+        pace_height + 500 // 2,
+        130, 30
+    )
+
+    pace_active = (255, 221, 0)
+    pace_passive = (0, 80, 157)
+    pace_text_active = (255, 255, 255)
+    pace_text_passive = (33, 37, 41)
+
+    step_color = pace_passive
+    step_color_text = pace_text_passive
+    fast_color = pace_passive
+    fast_color_text = pace_text_passive
 
     grid = generateGrid(n)
     for column in grid:
         print(column)
 
     trueGrid = generateGridSquares(grid)
-
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
 
-        screen.fill((25, 25, 25))
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if step_rect.collidepoint(event.pos):
+                    step_color = pace_active
+                    step_color_text = pace_text_active
+                    fast_color = pace_passive
+                    fast_color_text = pace_text_passive
+                elif fast_rect.collidepoint(event.pos):
+                    step_color = pace_passive
+                    step_color_text = pace_text_passive
+                    fast_color = pace_active
+                    fast_color_text = pace_text_active
 
-        dash_margin = (n * (box_size + box_margin) + (320 - ((box_margin + box_size) * n) // 2))
-        dash_margin = (1024 + dash_margin) / 2
+        screen.fill((25, 25, 25))
 
         screen.blit(text_main, (dash_margin - text_main.get_width() // 2, text_main.get_height() // 2))
         screen.blit(text_sub, (dash_margin - text_sub.get_width() // 2, text_main.get_height() + 10 + text_sub.get_height() // 2))
         screen.blit(curr_direction, (dash_margin - curr_direction.get_width() // 2, text_main.get_height() + text_sub.get_height() + 110 // 2))
 
+        direction = "East"
+        dir_render = font_dashboard.render(direction, True, (167, 201, 87))
+        screen.blit(dir_render, (dash_margin - dir_render.get_width() // 2,
+                                 text_main.get_height() + text_sub.get_height() + curr_direction.get_height() + 125 // 2))
+
+        screen.blit(ctr_header, (dash_margin - ctr_header.get_width() // 2,
+                                 text_main.get_height() + text_sub.get_height() + curr_direction.get_height() + 250 // 2))
+
+        rotate_ctr_int = "0"
+        scan_ctr_int = "0"
+        move_ctr_int = "0"
+
+        screen.blit(rotate_ctr, (dash_margin - rotate_ctr.get_width() + len(rotate_ctr_int) + 5 // 2, rotate_height + 300 // 2))
+        rotate_ctr_num = font_dashboard.render(rotate_ctr_int, True, (255, 159, 28))
+        screen.blit(rotate_ctr_num,
+                    ((dash_margin - rotate_ctr.get_width() + len(rotate_ctr_int) + 5 // 2) + rotate_ctr.get_width(),
+                     rotate_height + 300 // 2))
+
+        screen.blit(scan_ctr, (dash_margin - scan_ctr.get_width() + len(scan_ctr_int) + 5 // 2, scan_height + 325 // 2))
+        scan_ctr_num = font_dashboard.render(scan_ctr_int, True, (255, 159, 28))
+        screen.blit(scan_ctr_num,
+                    ((dash_margin - scan_ctr.get_width() + len(scan_ctr_int) + 5 // 2) + scan_ctr.get_width(),
+                     scan_height + 325 // 2))
+
+        screen.blit(move_ctr, (dash_margin - move_ctr.get_width() + len(move_ctr_int) + 5 // 2, move_height + 350 // 2))
+        move_ctr_num = font_dashboard.render(move_ctr_int, True, (255, 159, 28))
+        screen.blit(move_ctr_num,
+                    ((dash_margin - move_ctr.get_width() + len(move_ctr_int) + 5 // 2) + move_ctr.get_width(),
+                     move_height + 350 // 2))
+
+        screen.blit(pace_header, (dash_margin - pace_header.get_width() // 2, pace_height + 450 // 2))
+
+        pygame.draw.rect(screen, step_color, step_rect)
+        button_step = font_dashboard.render(pace_step, True, step_color_text)
+        screen.blit(button_step, (step_rect.x + (130 - button_step.get_width()) // 2, step_rect.y + 5))
+
+        pygame.draw.rect(screen, fast_color, fast_rect)
+        button_fast = font_dashboard.render(pace_fast, True, fast_color_text)
+        screen.blit(button_fast, (fast_rect.x + (130 - button_fast.get_width()) // 2, fast_rect.y + 5))
+
         row_ctr = 0
         for row in trueGrid:
             col_ctr = 0
             for column in row:
-                if column.getContent() == "MINER" or column.getContent() == "GOLD" or column.getContent() == "PIT" or column.getContent() == "BEACON":
+                if column.getContent() == "MINER" or column.getContent() == "GOLD"\
+                        or column.getContent() == "PIT" or column.getContent() == "BEACON":
                     if column.getContent() == "MINER":
                         print_icon = miner_icon
                     elif column.getContent() == "GOLD":
                         print_icon = gold_icon
                     elif column.getContent() == "PIT":
                         print_icon = pit_icon
-                    elif column.getContent() == "BEACON":
+                    else:
                         print_icon = beacon_icon
 
                     screen.blit(print_icon,
@@ -323,7 +397,6 @@ def homescreen():
     smart_color = algo_passive
     smart_color_text = algo_text_passive
 
-    active_text = False
     active_random = False
     active_smart = False
 
@@ -337,20 +410,30 @@ def homescreen():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if input_rect.collidepoint(event.pos):
-                    active_text = True
+                    n_color = n_active
                 else:
-                    active_text = False
+                    n_color = n_passive
 
                 if random_rect.collidepoint(event.pos):
+                    random_color = algo_active
+                    random_color_text = algo_text_active
+                    smart_color = algo_passive
+                    smart_color_text = algo_text_passive
+
                     active_random = True
                     active_smart = False
                 elif smart_rect.collidepoint(event.pos):
-                    active_smart = True
+                    random_color = algo_passive
+                    random_color_text = algo_text_passive
+                    smart_color = algo_active
+                    smart_color_text = algo_text_active
+
                     active_random = False
+                    active_smart = True
 
                 if enter_rect.collidepoint(event.pos):
                     if len(n_text) > 0 and str.isnumeric(n_text):
-                        if int(n_text) >= 8 and int(n_text) <= 64:
+                        if 8 <= int(n_text) <= 64:
                             if active_smart or active_random:
                                 done = False
                                 close_app = False
@@ -366,25 +449,6 @@ def homescreen():
         screen.blit(text_sub, (512 - text_sub.get_width() // 2, text_main.get_height() + text_sub.get_height() + 230 // 2))
         screen.blit(text_input, (512 - text_input.get_width() // 2, text_main.get_height() + text_sub.get_height() + 310 // 2))
 
-        if active_text:
-            n_color = n_active
-        else:
-            n_color = n_passive
-
-        if active_random:
-            random_color = algo_active
-            random_color_text = algo_text_active
-        else:
-            random_color = algo_passive
-            random_color_text = algo_text_passive
-
-        if active_smart:
-            smart_color = algo_active
-            smart_color_text = algo_text_active
-        else:
-            smart_color = algo_passive
-            smart_color_text = algo_text_passive
-
         pygame.draw.rect(screen, n_color, input_rect)
 
         text_surface = base_font.render(n_text, True, (33, 37, 41))
@@ -394,16 +458,17 @@ def homescreen():
         screen.blit(text_algo, (512 - text_algo.get_width() // 2,
                                 text_main.get_height() + text_sub.get_height() + text_surface.get_height() + 510 // 2))
         pygame.draw.rect(screen, random_color, random_rect)
+
         button_random = base_font.render(text_random, True, random_color_text)
-        screen.blit(button_random, (random_rect.x + 13, random_rect.y + 5))
+        screen.blit(button_random, (random_rect.x + (100 - button_random.get_width()) // 2, random_rect.y + 5))
 
         pygame.draw.rect(screen, smart_color, smart_rect)
         button_smart = base_font.render(text_smart, True, smart_color_text)
-        screen.blit(button_smart, (smart_rect.x + 20, smart_rect.y + 5))
+        screen.blit(button_smart, (smart_rect.x + (100 - button_smart.get_width()) // 2, smart_rect.y + 5))
 
         pygame.draw.rect(screen, (142, 202, 230), enter_rect)
         button_enter = base_font.render(text_enter, True, (255, 255, 255))
-        screen.blit(button_enter, (enter_rect.x + 28, enter_rect.y + 5))
+        screen.blit(button_enter, (enter_rect.x + (100 - button_enter.get_width()) // 2, enter_rect.y + 5))
 
         pygame.display.flip()
 
