@@ -25,20 +25,31 @@ class Miner():
     def ifVictor(self):
         return self.isVictor
 
-    def moveMiner(self):
-        if self.direction == "UP":
+    def moveMiner(self, grid):
+        oldCoords = self.getPosition()
+        oldRow = oldCoords[0]
+        oldCol = oldCoords[1]
+
+        grid[oldRow][oldCol].setMiner()
+
+        if self.direction == "UP" and self.postion[0] - 1 >= 0:
             self.position[0] -= 1
 
-        elif self.direction == "RIGHT":
+        elif self.direction == "RIGHT" and self.position[1] + 1 < len(grid):
             self.position[1] += 1
 
-        elif self.direction == "DOWN":
+        elif self.direction == "DOWN" and self.position[0] + 1 < len(grid):
             self.position[0] += 1
         
-        else: # direction == LEFT
+        elif self.direction == "LEFT" and self.position[1] - 1 >= 0:
             self.position[1] -= 1
 
         self.incrementActions()
+        newCoords = self.getPosition()
+        newRow = newCoords[0]
+        newCol = newCoords[1]
+        grid[newRow][newCol].setMiner()
+
         
     def rotateDirection(self): # rotate 90 degrees clockwise
         if self.direction == "UP":
@@ -55,7 +66,7 @@ class Miner():
 
         self.incrementActions()
 
-    def scan(self, grid, gridNumber):
+    def scan(self, grid):
         self.incrementActions()
         result = "EMPTY"
 
@@ -77,7 +88,7 @@ class Miner():
             tempRow = tempCoords[0]
             tempCol = tempCoords[1] + 1
 
-            while tempRow < gridNumber:
+            while tempRow < len(grid):
                 result = grid[tempRow][tempCol].getContent()
 
                 if result != "EMPTY":
@@ -90,7 +101,7 @@ class Miner():
             tempRow = tempCoords[0] + 1
             tempCol = tempCoords[1]
 
-            while tempRow < gridNumber:
+            while tempRow < len(grid):
                 result = grid[tempRow][tempCol].getContent()
 
                 if result != "EMPTY":
@@ -103,7 +114,7 @@ class Miner():
             tempRow = tempCoords[0]
             tempCol = tempCoords[1] - 1
 
-            while tempRow < gridNumber:
+            while tempRow >= 0:
                 result = grid[tempRow][tempCol].getContent()
 
                 if result != "EMPTY":
