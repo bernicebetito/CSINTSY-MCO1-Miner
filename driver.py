@@ -1,7 +1,13 @@
 import miner, gridSquare, random, math, pygame, os
+import threading, queue, time
 
 pygame.init()
 pygame.display.set_caption('MCO1: Miner')
+miner_element = miner.Miner("RIGHT")
+
+threadLock = threading.Lock()
+current_queue = queue.Queue()
+time_queue = queue.Queue()
 
 
 # searching for gold for beacon placement
@@ -48,6 +54,7 @@ def searchLeft(grid, currentRow, currentCol):
 def generateGrid(gridNumber):  # generate grid blueprint
     pits = math.ceil(gridNumber * 0.25)
     beacons = math.ceil(gridNumber * 0.1)
+    pos_miner = miner_element.getPosition()
 
     # samplingList = ["PIT", "GOLD", "EMPTY"]
     counts = {"PIT": 0, "BEACON": 0, "GOLD": 0, "EMPTY": 0}
@@ -60,7 +67,7 @@ def generateGrid(gridNumber):  # generate grid blueprint
         column = []
 
         for columns in range(gridNumber):
-            if rows == 0 and columns == 0:  # miner
+            if rows == pos_miner[0] and columns == pos_miner[1]:  # miner
                 column.append("MINER")
                 continue
 
@@ -134,18 +141,34 @@ def generateGrid(gridNumber):  # generate grid blueprint
 
 def generateGridSquares(grid):  # returns a grid of gridSquare class elements using a grid blueprint
     trueGrid = []
+    pos_miner = miner_element.getPosition()
+
+    row_ctr = 0
     for rows in grid:
         column = []
+        col_ctr = 0
         for columns in rows:
             if columns == "MINER":
-                gridElement = miner.Miner("RIGHT")
-
+                gridElement = gridSquare.gridSquare("PREV")
+                grid[row_ctr][col_ctr] = "PREV"
+            elif row_ctr == pos_miner[0] and col_ctr == pos_miner[1]:
+                if columns == "PIT":
+                    gridElement = gridSquare.gridSquare("LOSE")
+                    miner_element.setMinerDeath()
+                elif columns == "GOLD":
+                    gridElement = gridSquare.gridSquare("WIN")
+                    miner_element.setMinerVictor()
+                else:
+                    gridElement = miner_element
+                    grid[row_ctr][col_ctr] = "MINER"
             else:
                 gridElement = gridSquare.gridSquare(columns)
 
             column.append(gridElement)
+            col_ctr += 1
 
         trueGrid.append(column)
+        row_ctr += 1
 
     return trueGrid
 
@@ -215,6 +238,10 @@ def miner_screen(n_str, random_status, smart_status):
     move_height = scan_height + scan_ctr.get_height()
     pace_height = move_height + move_ctr.get_height()
 
+    rotate_ctr_int = 0
+    scan_ctr_int = 0
+    move_ctr_int = 0
+
     pace_header = font_dashboard.render("Choose Pace:", True, (240, 246, 246))
     pace_step = "Step by Step"
     step_rect = pygame.Rect(
@@ -235,15 +262,15 @@ def miner_screen(n_str, random_status, smart_status):
     pace_text_active = (255, 255, 255)
     pace_text_passive = (33, 37, 41)
 
+    pace = "NONE"
+
     step_color = pace_passive
     step_color_text = pace_text_passive
     fast_color = pace_passive
     fast_color_text = pace_text_passive
 
+    miner_status = False
     grid = generateGrid(n)
-    for column in grid:
-        print(column)
-
     trueGrid = generateGridSquares(grid)
     while not done:
         for event in pygame.event.get():
@@ -251,16 +278,18 @@ def miner_screen(n_str, random_status, smart_status):
                 done = True
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if step_rect.collidepoint(event.pos):
+                if step_rect.collidepoint(event.pos) and pace == "NONE":
                     step_color = pace_active
                     step_color_text = pace_text_active
                     fast_color = pace_passive
                     fast_color_text = pace_text_passive
-                elif fast_rect.collidepoint(event.pos):
+                    pace = "STEP"
+                elif fast_rect.collidepoint(event.pos) and pace == "NONE":
                     step_color = pace_passive
                     step_color_text = pace_text_passive
                     fast_color = pace_active
                     fast_color_text = pace_text_active
+                    pace = "FAST"
 
         screen.fill((25, 25, 25))
 
@@ -268,7 +297,7 @@ def miner_screen(n_str, random_status, smart_status):
         screen.blit(text_sub, (dash_margin - text_sub.get_width() // 2, text_main.get_height() + 10 + text_sub.get_height() // 2))
         screen.blit(curr_direction, (dash_margin - curr_direction.get_width() // 2, text_main.get_height() + text_sub.get_height() + 110 // 2))
 
-        direction = "East"
+        direction = miner_element.getDirection()
         dir_render = font_dashboard.render(direction, True, (167, 201, 87))
         screen.blit(dir_render, (dash_margin - dir_render.get_width() // 2,
                                  text_main.get_height() + text_sub.get_height() + curr_direction.get_height() + 125 // 2))
@@ -276,26 +305,26 @@ def miner_screen(n_str, random_status, smart_status):
         screen.blit(ctr_header, (dash_margin - ctr_header.get_width() // 2,
                                  text_main.get_height() + text_sub.get_height() + curr_direction.get_height() + 250 // 2))
 
-        rotate_ctr_int = "0"
-        scan_ctr_int = "0"
-        move_ctr_int = "0"
+        rotate_ctr_str = str(rotate_ctr_int)
+        scan_ctr_str = str(scan_ctr_int)
+        move_ctr_str = str(move_ctr_int)
 
-        screen.blit(rotate_ctr, (dash_margin - rotate_ctr.get_width() + len(rotate_ctr_int) + 5 // 2, rotate_height + 300 // 2))
-        rotate_ctr_num = font_dashboard.render(rotate_ctr_int, True, (255, 159, 28))
+        screen.blit(rotate_ctr, (dash_margin - rotate_ctr.get_width() + len(rotate_ctr_str) + 5 // 2, rotate_height + 300 // 2))
+        rotate_ctr_num = font_dashboard.render(rotate_ctr_str, True, (255, 159, 28))
         screen.blit(rotate_ctr_num,
-                    ((dash_margin - rotate_ctr.get_width() + len(rotate_ctr_int) + 5 // 2) + rotate_ctr.get_width(),
+                    ((dash_margin - rotate_ctr.get_width() + len(rotate_ctr_str) + 5 // 2) + rotate_ctr.get_width(),
                      rotate_height + 300 // 2))
 
-        screen.blit(scan_ctr, (dash_margin - scan_ctr.get_width() + len(scan_ctr_int) + 5 // 2, scan_height + 325 // 2))
-        scan_ctr_num = font_dashboard.render(scan_ctr_int, True, (255, 159, 28))
+        screen.blit(scan_ctr, (dash_margin - scan_ctr.get_width() + len(scan_ctr_str) + 5 // 2, scan_height + 325 // 2))
+        scan_ctr_num = font_dashboard.render(scan_ctr_str, True, (255, 159, 28))
         screen.blit(scan_ctr_num,
-                    ((dash_margin - scan_ctr.get_width() + len(scan_ctr_int) + 5 // 2) + scan_ctr.get_width(),
+                    ((dash_margin - scan_ctr.get_width() + len(scan_ctr_str) + 5 // 2) + scan_ctr.get_width(),
                      scan_height + 325 // 2))
 
-        screen.blit(move_ctr, (dash_margin - move_ctr.get_width() + len(move_ctr_int) + 5 // 2, move_height + 350 // 2))
-        move_ctr_num = font_dashboard.render(move_ctr_int, True, (255, 159, 28))
+        screen.blit(move_ctr, (dash_margin - move_ctr.get_width() + len(move_ctr_str) + 5 // 2, move_height + 350 // 2))
+        move_ctr_num = font_dashboard.render(move_ctr_str, True, (255, 159, 28))
         screen.blit(move_ctr_num,
-                    ((dash_margin - move_ctr.get_width() + len(move_ctr_int) + 5 // 2) + move_ctr.get_width(),
+                    ((dash_margin - move_ctr.get_width() + len(move_ctr_str) + 5 // 2) + move_ctr.get_width(),
                      move_height + 350 // 2))
 
         screen.blit(pace_header, (dash_margin - pace_header.get_width() // 2, pace_height + 450 // 2))
@@ -312,7 +341,30 @@ def miner_screen(n_str, random_status, smart_status):
         for row in trueGrid:
             col_ctr = 0
             for column in row:
-                if column.getContent() == "MINER" or column.getContent() == "GOLD"\
+                if column.getContent() == "PREV":
+                    pygame.draw.rect(screen, (60, 60, 60),
+                                     [((box_margin + box_size) * col_ctr + box_margin) + (
+                                                 320 - ((box_margin + box_size) * n) // 2),
+                                      ((box_margin + box_size) * row_ctr + box_margin) + 20,
+                                      box_size,
+                                      box_size])
+                elif column.getContent() == "LOSE":
+                    pygame.draw.rect(screen, (255, 0, 0),
+                                     [((box_margin + box_size) * col_ctr + box_margin) + (
+                                                 320 - ((box_margin + box_size) * n) // 2),
+                                      ((box_margin + box_size) * row_ctr + box_margin) + 20,
+                                      box_size,
+                                      box_size])
+                    miner_status = True
+                elif column.getContent() == "WIN":
+                    pygame.draw.rect(screen, (255, 165, 0),
+                                     [((box_margin + box_size) * col_ctr + box_margin) + (
+                                                 320 - ((box_margin + box_size) * n) // 2),
+                                      ((box_margin + box_size) * row_ctr + box_margin) + 20,
+                                      box_size,
+                                      box_size])
+                    miner_status = True
+                elif column.getContent() == "MINER" or column.getContent() == "GOLD"\
                         or column.getContent() == "PIT" or column.getContent() == "BEACON":
                     if column.getContent() == "MINER":
                         print_icon = miner_icon
@@ -337,7 +389,40 @@ def miner_screen(n_str, random_status, smart_status):
                 col_ctr += 1
             row_ctr += 1
 
+        if algo == "RANDOM" and not miner_status and pace != "NONE":
+            choice = random.randint(1, 3)
+            if choice == 1:
+                miner_element.rotateDirection()
+                rotate_ctr_int += 1
+            elif choice == 2:
+                if miner_element.getDirection() == "UP":
+                    if miner_element.getPosition()[0] > 0:
+                        miner_element.moveMiner(grid)
+                        trueGrid = generateGridSquares(grid)
+                        move_ctr_int += 1
+                elif miner_element.getDirection() == "LEFT":
+                    if miner_element.getPosition()[1] > 0:
+                        miner_element.moveMiner(grid)
+                        trueGrid = generateGridSquares(grid)
+                        move_ctr_int += 1
+                elif miner_element.getDirection() == "DOWN":
+                    if miner_element.getPosition()[0] < n - 1:
+                        miner_element.moveMiner(grid)
+                        trueGrid = generateGridSquares(grid)
+                        move_ctr_int += 1
+                elif miner_element.getDirection() == "RIGHT":
+                    if miner_element.getPosition()[1] < n - 1:
+                        miner_element.moveMiner(grid)
+                        trueGrid = generateGridSquares(grid)
+                        move_ctr_int += 1
+            elif choice == 3:
+                miner_element.scan(grid)
+                scan_ctr_int += 1
+
         pygame.display.flip()
+
+        if pace == "STEP":
+            pygame.time.delay(500)
 
 
 def homescreen():

@@ -1,11 +1,12 @@
+import gridSquare
 class Miner():
 
     def __init__(self, direction):
-        self.position = (0, 0) # default 0,0 (row, col)
-        self.direction = direction # UP, DOWN, LEFT or RIGHT
-        self.actions = 0 # miner action count
-        self.isDead = False # if miner has moved into a pit
-        self.isVictor = False # if miner has reached pot of gold
+        self.position = [0, 0]  # default 0,0 (row, col)
+        self.direction = direction  # UP, DOWN, LEFT or RIGHT
+        self.actions = 0  # miner action count
+        self.isDead = False  # if miner has moved into a pit
+        self.isVictor = False  # if miner has reached pot of gold
 
     def getContent(self):
         return "MINER"
@@ -30,9 +31,9 @@ class Miner():
         oldRow = oldCoords[0]
         oldCol = oldCoords[1]
 
-        grid[oldRow][oldCol].setMiner()
+        gridSquare.gridSquare(grid[oldRow][oldCol])
 
-        if self.direction == "UP" and self.postion[0] - 1 >= 0:
+        if self.direction == "UP" and self.position[0] - 1 >= 0:
             self.position[0] -= 1
 
         elif self.direction == "RIGHT" and self.position[1] + 1 < len(grid):
@@ -40,7 +41,7 @@ class Miner():
 
         elif self.direction == "DOWN" and self.position[0] + 1 < len(grid):
             self.position[0] += 1
-        
+
         elif self.direction == "LEFT" and self.position[1] - 1 >= 0:
             self.position[1] -= 1
 
@@ -48,21 +49,20 @@ class Miner():
         newCoords = self.getPosition()
         newRow = newCoords[0]
         newCol = newCoords[1]
-        grid[newRow][newCol].setMiner()
+        gridSquare.gridSquare(grid[newRow][newCol])
 
-        
-    def rotateDirection(self): # rotate 90 degrees clockwise
+    def rotateDirection(self):  # rotate 90 degrees clockwise
         if self.direction == "UP":
             self.direction = "RIGHT"
 
         elif self.direction == "RIGHT":
-            self.direction == "DOWN"
+            self.direction = "DOWN"
 
         elif self.direction == "DOWN":
-            self.direction == "LEFT"
-        
-        else: # direction == LEFT
-            self.direction == "UP"
+            self.direction = "LEFT"
+
+        else:  # direction == LEFT
+            self.direction = "UP"
 
         self.incrementActions()
 
@@ -71,12 +71,12 @@ class Miner():
         result = "EMPTY"
 
         if self.direction == "UP":
-            tempCoords = self.getPosition
+            tempCoords = self.getPosition()
             tempRow = tempCoords[0] - 1
             tempCol = tempCoords[1]
 
             while tempRow >= 0:
-                result = grid[tempRow][tempCol].getContent()
+                result = grid[tempRow][tempCol]
 
                 if result != "EMPTY":
                     return result
@@ -84,12 +84,12 @@ class Miner():
                 tempRow -= 1
 
         elif self.direction == "RIGHT":
-            tempCoords = self.getPosition
+            tempCoords = self.getPosition()
             tempRow = tempCoords[0]
             tempCol = tempCoords[1] + 1
 
-            while tempRow < len(grid):
-                result = grid[tempRow][tempCol].getContent()
+            while tempRow < len(grid) and tempCol < len(grid):
+                result = grid[tempRow][tempCol]
 
                 if result != "EMPTY":
                     return result
@@ -97,25 +97,25 @@ class Miner():
                 tempCol += 1
 
         elif self.direction == "DOWN":
-            tempCoords = self.getPosition
+            tempCoords = self.getPosition()
             tempRow = tempCoords[0] + 1
             tempCol = tempCoords[1]
 
-            while tempRow < len(grid):
-                result = grid[tempRow][tempCol].getContent()
+            while tempRow < len(grid) and tempCol < len(grid):
+                result = grid[tempRow][tempCol]
 
                 if result != "EMPTY":
                     return result
 
                 tempRow += 1
-        
-        else: # direction == LEFT
-            tempCoords = self.getPosition
+
+        else:  # direction == LEFT
+            tempCoords = self.getPosition()
             tempRow = tempCoords[0]
             tempCol = tempCoords[1] - 1
 
             while tempRow >= 0:
-                result = grid[tempRow][tempCol].getContent()
+                result = grid[tempRow][tempCol]
 
                 if result != "EMPTY":
                     return result
