@@ -230,30 +230,38 @@ def miner_screen(n_str, random_status, smart_status):
     scan_ctr = font_dashboard.render("Scan: ", True, (240, 246, 246))
     move_ctr = font_dashboard.render("Move: ", True, (240, 246, 246))
 
+    scan_header = font_dashboard.render("Scan Result: ", True, (240, 246, 246))
+    scan_result = "NONE"
+    beacon_header = font_dashboard.render("Beacon Result: ", True, (240, 246, 246))
+    beacon_result = "NONE"
+
+    pace_header = font_dashboard.render("Choose Pace:", True, (240, 246, 246))
+
+    rotate_ctr_int = 0
+    scan_ctr_int = 0
+    move_ctr_int = 0
+
     dash_margin = (n * (box_size + box_margin) + (320 - ((box_margin + box_size) * n) // 2))
     dash_margin = (1024 + dash_margin) / 2
 
     rotate_height = text_main.get_height() + text_sub.get_height() + curr_direction.get_height() + ctr_header.get_height()
     scan_height = rotate_height + rotate_ctr.get_height()
     move_height = scan_height + scan_ctr.get_height()
-    pace_height = move_height + move_ctr.get_height()
+    scan_res_height = move_height + move_ctr.get_height()
+    beacon_res_height = scan_res_height + scan_header.get_height()
+    pace_height = beacon_res_height + beacon_header.get_height()
 
-    rotate_ctr_int = 0
-    scan_ctr_int = 0
-    move_ctr_int = 0
-
-    pace_header = font_dashboard.render("Choose Pace:", True, (240, 246, 246))
     pace_step = "Step by Step"
     step_rect = pygame.Rect(
         dash_margin - 285 // 2,
-        pace_height + 500 // 2,
+        pace_height + 650 // 2,
         130, 30
     )
 
     pace_fast = "Fast"
     fast_rect = pygame.Rect(
         dash_margin + 25 // 2,
-        pace_height + 500 // 2,
+        pace_height + 650 // 2,
         130, 30
     )
 
@@ -270,6 +278,8 @@ def miner_screen(n_str, random_status, smart_status):
     fast_color_text = pace_text_passive
 
     miner_status = False
+    miner_dead = False
+    miner_won = False
     grid = generateGrid(n)
     trueGrid = generateGridSquares(grid)
     while not done:
@@ -327,8 +337,19 @@ def miner_screen(n_str, random_status, smart_status):
                     ((dash_margin - move_ctr.get_width() + len(move_ctr_str) + 5 // 2) + move_ctr.get_width(),
                      move_height + 350 // 2))
 
-        screen.blit(pace_header, (dash_margin - pace_header.get_width() // 2, pace_height + 450 // 2))
+        screen.blit(scan_header, (dash_margin - scan_header.get_width() + len(scan_result) // 2, scan_res_height + 450 // 2))
+        scan_result_str = font_dashboard.render(scan_result, True, (106, 90, 205))
+        screen.blit(scan_result_str,
+                    ((dash_margin - scan_header.get_width() + len(scan_result) + 5 // 2) + scan_header.get_width(),
+                     scan_res_height + 450 // 2))
 
+        screen.blit(beacon_header, (dash_margin - beacon_header.get_width() + len(beacon_result) // 2, beacon_res_height + 475 // 2))
+        beacon_result_str = font_dashboard.render(beacon_result, True, (106, 90, 205))
+        screen.blit(beacon_result_str,
+                    ((dash_margin - beacon_header.get_width() + len(beacon_result) + 5 // 2) + beacon_header.get_width(),
+                    beacon_res_height + 475 // 2))
+
+        screen.blit(pace_header, (dash_margin - pace_header.get_width() // 2, pace_height + 550 // 2))
         pygame.draw.rect(screen, step_color, step_rect)
         button_step = font_dashboard.render(pace_step, True, step_color_text)
         screen.blit(button_step, (step_rect.x + (130 - button_step.get_width()) // 2, step_rect.y + 5))
@@ -341,7 +362,24 @@ def miner_screen(n_str, random_status, smart_status):
         for row in trueGrid:
             col_ctr = 0
             for column in row:
-                if column.getContent() == "PREV":
+                if column.getContent() == "MINER" or column.getContent() == "GOLD" \
+                        or column.getContent() == "PIT" or column.getContent() == "BEACON":
+                    if column.getContent() == "MINER":
+                        print_icon = miner_icon
+                    elif column.getContent() == "GOLD":
+                        print_icon = gold_icon
+                    elif column.getContent() == "PIT":
+                        print_icon = pit_icon
+                    else:
+                        print_icon = beacon_icon
+
+                    screen.blit(print_icon,
+                                [((box_margin + box_size) * col_ctr + box_margin) + (
+                                            320 - ((box_margin + box_size) * n) // 2),
+                                 ((box_margin + box_size) * row_ctr + box_margin) + 20,
+                                 box_size,
+                                 box_size])
+                elif column.getContent() == "PREV":
                     pygame.draw.rect(screen, (60, 60, 60),
                                      [((box_margin + box_size) * col_ctr + box_margin) + (
                                                  320 - ((box_margin + box_size) * n) // 2),
@@ -356,6 +394,7 @@ def miner_screen(n_str, random_status, smart_status):
                                       box_size,
                                       box_size])
                     miner_status = True
+                    miner_dead = True
                 elif column.getContent() == "WIN":
                     pygame.draw.rect(screen, (255, 165, 0),
                                      [((box_margin + box_size) * col_ctr + box_margin) + (
@@ -364,22 +403,7 @@ def miner_screen(n_str, random_status, smart_status):
                                       box_size,
                                       box_size])
                     miner_status = True
-                elif column.getContent() == "MINER" or column.getContent() == "GOLD"\
-                        or column.getContent() == "PIT" or column.getContent() == "BEACON":
-                    if column.getContent() == "MINER":
-                        print_icon = miner_icon
-                    elif column.getContent() == "GOLD":
-                        print_icon = gold_icon
-                    elif column.getContent() == "PIT":
-                        print_icon = pit_icon
-                    else:
-                        print_icon = beacon_icon
-
-                    screen.blit(print_icon,
-                                [((box_margin + box_size) * col_ctr + box_margin) + (320 - ((box_margin + box_size) * n) // 2),
-                                 ((box_margin + box_size) * row_ctr + box_margin) + 20,
-                                 box_size,
-                                 box_size])
+                    miner_won = True
                 else:
                     pygame.draw.rect(screen, (200, 200, 200),
                                      [((box_margin + box_size) * col_ctr + box_margin) + (320 - ((box_margin + box_size) * n) // 2),
@@ -416,8 +440,15 @@ def miner_screen(n_str, random_status, smart_status):
                         trueGrid = generateGridSquares(grid)
                         move_ctr_int += 1
             elif choice == 3:
-                miner_element.scan(grid)
+                scan_result = miner_element.scan(grid)
                 scan_ctr_int += 1
+        else:
+            if miner_dead:
+                end_message = font_dashboard.render("Game Over!", True, (255, 0, 0))
+                screen.blit(end_message, (320 - end_message.get_width() // 2, ((box_margin + box_size) * n + box_margin) + 30))
+            elif miner_won:
+                end_message = font_dashboard.render("Congratulations!", True, (255, 165, 0))
+                screen.blit(end_message, (320 - end_message.get_width() // 2, ((box_margin + box_size) * n + box_margin) + 30))
 
         pygame.display.flip()
 
