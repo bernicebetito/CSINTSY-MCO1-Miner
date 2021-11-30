@@ -5,10 +5,6 @@ pygame.init()
 pygame.display.set_caption('MCO1: Miner')
 miner_element = miner.Miner("RIGHT")
 
-threadLock = threading.Lock()
-current_queue = queue.Queue()
-time_queue = queue.Queue()
-
 
 # searching for gold for beacon placement
 def searchTop(grid, currentRow, currentCol):
@@ -49,6 +45,59 @@ def searchLeft(grid, currentRow, currentCol):
         tempCol -= 1
 
     return False
+
+
+def find_gold(grid, currentRow, currentCol, n):
+    beacon_list = []
+
+    # Search Top
+    tempRow = currentRow - 1
+    while tempRow >= 0:
+        if grid[tempRow][currentCol] == "GOLD":
+            beacon_top = tempRow
+            tempRow = -1
+        tempRow -= 1
+    beacon_top = tempRow
+    if beacon_top > 0:
+        beacon_list.append(beacon_top)
+
+    # Seacrh Bottom
+    tempRow = currentRow + 1
+    while tempRow < n:
+        if grid[tempRow][currentCol] == "GOLD":
+            beacon_bottom = tempRow
+            tempRow = n
+        tempRow += 1
+    beacon_bottom = tempRow
+    if beacon_bottom > 0:
+        beacon_list.append(beacon_bottom)
+
+    # Search Right
+    tempCol = currentCol + 1
+    while tempCol < n:
+        if grid[currentRow][tempCol] == "GOLD":
+            beacon_right = tempCol
+            tempCol = n
+        tempCol += 1
+    beacon_right = tempCol
+    if beacon_right > 0:
+        beacon_list.append(beacon_right)
+
+    # Search Left
+    tempCol = currentCol - 1
+    while tempCol >= 0:
+        if grid[currentRow][tempCol] == "GOLD":
+            beacon_left = tempCol
+            tempCol = -1
+        tempCol -= 1
+    beacon_left = tempCol
+    if beacon_left > 0:
+        beacon_list.append(beacon_left)
+
+    if len(beacon_list) > 0:
+        return min(beacon_list)
+    else:
+        return 0
 
 
 def generateGrid(gridNumber):  # generate grid blueprint
@@ -149,8 +198,11 @@ def generateGridSquares(grid):  # returns a grid of gridSquare class elements us
         col_ctr = 0
         for columns in rows:
             if columns == "MINER":
-                gridElement = gridSquare.gridSquare("PREV")
-                grid[row_ctr][col_ctr] = "PREV"
+                if grid[row_ctr][col_ctr] != "BEACON":
+                    gridElement = gridSquare.gridSquare("PREV")
+                    grid[row_ctr][col_ctr] = "PREV"
+                else:
+                    gridElement = gridSquare.gridSquare("BEACON")
             elif row_ctr == pos_miner[0] and col_ctr == pos_miner[1]:
                 if columns == "PIT":
                     gridElement = gridSquare.gridSquare("LOSE")
@@ -158,6 +210,9 @@ def generateGridSquares(grid):  # returns a grid of gridSquare class elements us
                 elif columns == "GOLD":
                     gridElement = gridSquare.gridSquare("WIN")
                     miner_element.setMinerVictor()
+                elif columns == "BEACON":
+                    gridElement = gridSquare.gridSquare("BEACON")
+                    grid[row_ctr][col_ctr] = "BEACON"
                 else:
                     gridElement = miner_element
                     grid[row_ctr][col_ctr] = "MINER"
@@ -439,8 +494,15 @@ def miner_screen(n_str, random_status, smart_status):
                         miner_element.moveMiner(grid)
                         trueGrid = generateGridSquares(grid)
                         move_ctr_int += 1
+
+                if grid[miner_element.getPosition()[0]][miner_element.getPosition()[1]] == "BEACON":
+                    beacon_hint = find_gold(grid, miner_element.getPosition()[0], miner_element.getPosition()[1], n)
+                    beacon_result = str(beacon_hint)
+
             elif choice == 3:
                 scan_result = miner_element.scan(grid)
+                if scan_result == "PREV":
+                    scan_result = "EMPTY"
                 scan_ctr_int += 1
         else:
             if miner_dead:

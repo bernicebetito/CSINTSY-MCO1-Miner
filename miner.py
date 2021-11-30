@@ -78,7 +78,7 @@ class Miner():
             while tempRow >= 0:
                 result = grid[tempRow][tempCol]
 
-                if result != "EMPTY":
+                if result != "EMPTY" and result != "PREV":
                     return result
 
                 tempRow -= 1
@@ -88,10 +88,10 @@ class Miner():
             tempRow = tempCoords[0]
             tempCol = tempCoords[1] + 1
 
-            while tempRow < len(grid) and tempCol < len(grid):
+            while tempCol < len(grid):
                 result = grid[tempRow][tempCol]
 
-                if result != "EMPTY":
+                if result != "EMPTY" and result != "PREV":
                     return result
 
                 tempCol += 1
@@ -101,10 +101,10 @@ class Miner():
             tempRow = tempCoords[0] + 1
             tempCol = tempCoords[1]
 
-            while tempRow < len(grid) and tempCol < len(grid):
+            while tempRow < len(grid):
                 result = grid[tempRow][tempCol]
 
-                if result != "EMPTY":
+                if result != "EMPTY" and result != "PREV":
                     return result
 
                 tempRow += 1
@@ -114,10 +114,10 @@ class Miner():
             tempRow = tempCoords[0]
             tempCol = tempCoords[1] - 1
 
-            while tempRow >= 0:
+            while tempCol >= 0:
                 result = grid[tempRow][tempCol]
 
-                if result != "EMPTY":
+                if result != "EMPTY" and result != "PREV":
                     return result
 
                 tempCol -= 1
