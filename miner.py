@@ -1,7 +1,7 @@
 class Miner():
 
     def __init__(self, direction):
-        self.position = (0, 0) # default 0,0
+        self.position = (0, 0) # default 0,0 (row, col)
         self.direction = direction # UP, DOWN, LEFT or RIGHT
         self.actions = 0 # miner action count
         self.isDead = False # if miner has moved into a pit
@@ -27,16 +27,16 @@ class Miner():
 
     def moveMiner(self):
         if self.direction == "UP":
-            self.position[1] -= 1
+            self.position[0] -= 1
 
         elif self.direction == "RIGHT":
-            self.position[0] += 1
+            self.position[1] += 1
 
         elif self.direction == "DOWN":
-            self.position[1] += 1
+            self.position[0] += 1
         
         else: # direction == LEFT
-            self.position[0] -= 1
+            self.position[1] -= 1
 
         self.incrementActions()
         
@@ -54,6 +54,64 @@ class Miner():
             self.direction == "UP"
 
         self.incrementActions()
+
+    def scan(self, grid, gridNumber):
+        self.incrementActions()
+        result = "EMPTY"
+
+        if self.direction == "UP":
+            tempCoords = self.getPosition
+            tempRow = tempCoords[0] - 1
+            tempCol = tempCoords[1]
+
+            while tempRow >= 0:
+                result = grid[tempRow][tempCol].getContent()
+
+                if result != "EMPTY":
+                    return result
+
+                tempRow -= 1
+
+        elif self.direction == "RIGHT":
+            tempCoords = self.getPosition
+            tempRow = tempCoords[0]
+            tempCol = tempCoords[1] + 1
+
+            while tempRow < gridNumber:
+                result = grid[tempRow][tempCol].getContent()
+
+                if result != "EMPTY":
+                    return result
+
+                tempCol += 1
+
+        elif self.direction == "DOWN":
+            tempCoords = self.getPosition
+            tempRow = tempCoords[0] + 1
+            tempCol = tempCoords[1]
+
+            while tempRow < gridNumber:
+                result = grid[tempRow][tempCol].getContent()
+
+                if result != "EMPTY":
+                    return result
+
+                tempRow += 1
+        
+        else: # direction == LEFT
+            tempCoords = self.getPosition
+            tempRow = tempCoords[0]
+            tempCol = tempCoords[1] - 1
+
+            while tempRow < gridNumber:
+                result = grid[tempRow][tempCol].getContent()
+
+                if result != "EMPTY":
+                    return result
+
+                tempCol -= 1
+
+        return result
 
     def incrementActions(self):
         self.actions += 1
