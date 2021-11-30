@@ -8,43 +8,75 @@ miner_element = miner.Miner("RIGHT")
 
 # searching for gold for beacon placement
 def searchTop(grid, currentRow, currentCol):
+    result = False
     tempRow = currentRow - 1
     while tempRow >= 0:
         if grid[tempRow][currentCol] == "GOLD":
-            return True
+            result = True
+            break
+        if grid[tempRow][currentCol] == "PIT":
+            result = False
+            break
+        if grid[tempRow][currentCol] == "BEACON":
+            result = False
+            break
         tempRow -= 1
 
-    return False
+    return result
 
 
 def searchBottom(grid, currentRow, currentCol, gridNumber):
+    result = False
     tempRow = currentRow + 1
     while tempRow < gridNumber:
         if grid[tempRow][currentCol] == "GOLD":
-            return True
+            result = True
+            break
+        if grid[tempRow][currentCol] == "PIT":
+            result = False
+            break
+        if grid[tempRow][currentCol] == "BEACON":
+            result = False
+            break
         tempRow += 1
 
-    return False
+    return result
 
 
 def searchRight(grid, currentRow, currentCol, gridNumber):
+    result = False
     tempCol = currentCol + 1
     while tempCol < gridNumber:
         if grid[currentRow][tempCol] == "GOLD":
-            return True
+            result = True
+            break
+        if grid[currentRow][tempCol] == "PIT":
+            result = False
+            break
+        if grid[currentRow][tempCol] == "BEACON":
+            result = False
+            break
         tempCol += 1
 
-    return False
+    return result
 
 
 def searchLeft(grid, currentRow, currentCol):
+    result = False
     tempCol = currentCol - 1
     while tempCol >= 0:
         if grid[currentRow][tempCol] == "GOLD":
-            return True
+            result = True
+            break
+        if grid[currentRow][tempCol] == "PIT":
+            result = False
+            break
+        if grid[currentRow][tempCol] == "BEACON":
+            result = False
+            break
         tempCol -= 1
 
-    return False
+    return result
 
 
 def find_gold(grid, currentRow, currentCol, n):
