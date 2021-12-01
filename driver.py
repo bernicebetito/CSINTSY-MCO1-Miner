@@ -86,49 +86,45 @@ def find_gold(grid, currentRow, currentCol, n):
     tempRow = currentRow
     row_ctr = 0
     while tempRow >= 0:
-        row_ctr += 1
         beacon_top = row_ctr
+        row_ctr += 1
         if grid[tempRow][currentCol] == "GOLD":
+            beacon_list.append(beacon_top)
             tempRow = -1
         tempRow -= 1
-    if beacon_top > 0:
-        beacon_list.append(beacon_top)
 
     # Seacrh Bottom
     tempRow = currentRow
     row_ctr = 0
     while tempRow < n:
-        row_ctr += 1
         beacon_bottom = row_ctr
+        row_ctr += 1
         if grid[tempRow][currentCol] == "GOLD":
+            beacon_list.append(beacon_bottom)
             tempRow = n
         tempRow += 1
-    if beacon_bottom > 0:
-        beacon_list.append(beacon_bottom)
 
     # Search Right
     tempCol = currentCol
     col_ctr = 0
     while tempCol < n:
-        col_ctr += 1
         beacon_right = col_ctr
+        col_ctr += 1
         if grid[currentRow][tempCol] == "GOLD":
+            beacon_list.append(beacon_right)
             tempCol = n
         tempCol += 1
-    if beacon_right > 0:
-        beacon_list.append(beacon_right)
 
     # Search Left
     tempCol = currentCol
     col_ctr = 0
     while tempCol >= 0:
-        col_ctr += 1
         beacon_left = col_ctr
+        col_ctr += 1
         if grid[currentRow][tempCol] == "GOLD":
+            beacon_list.append(beacon_left)
             tempCol = -1
         tempCol -= 1
-    if beacon_left > 0:
-        beacon_list.append(beacon_left)
 
     if len(beacon_list) > 0:
         return min(beacon_list)
@@ -323,7 +319,7 @@ def miner_screen(n_str, random_status, smart_status):
 
     scan_header = font_dashboard.render("Scan Result: ", True, (240, 246, 246))
     scan_result = "NONE"
-    beacon_header = font_dashboard.render("Beacon Result: ", True, (240, 246, 246))
+    beacon_header = font_dashboard.render("Beacon Hint: ", True, (240, 246, 246))
     beacon_result = "NONE"
 
     pace_header = font_dashboard.render("Choose Pace:", True, (240, 246, 246))
