@@ -570,6 +570,9 @@ def miner_screen(n_str, random_status, smart_status):
                 trueGrid = generateGridSquares(grid)
                 move_ctr_int += 1
 
+            scan_result = scan_result_smart
+            if scan_result == "PREV":
+                scan_result = "EMPTY"
         else:
             if miner_dead:
                 end_message = font_dashboard.render("Game Over!", True, (255, 0, 0))
