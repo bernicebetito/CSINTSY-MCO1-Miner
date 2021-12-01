@@ -504,7 +504,7 @@ def miner_screen(n_str, random_status, smart_status):
                 col_ctr += 1
             row_ctr += 1
 
-        if algo == "RANDOM" and not miner_status and pace != "NONE":
+        if algo == "RANDOM" and not miner_status and pace != "NONE": # Random Algo
             choice = random.randint(1, 3)
             if choice == 1:
                 miner_element.rotateDirection()
@@ -531,10 +531,6 @@ def miner_screen(n_str, random_status, smart_status):
                         trueGrid = generateGridSquares(grid)
                         move_ctr_int += 1
 
-                if grid[miner_element.getPosition()[0]][miner_element.getPosition()[1]] == "BEACON":
-                    beacon_hint = find_gold(grid, miner_element.getPosition()[0], miner_element.getPosition()[1], n)
-                    beacon_result = str(beacon_hint)
-
             elif choice == 3:
                 scan_result = miner_element.scan(grid)
                 if scan_result == "PREV":
@@ -545,35 +541,27 @@ def miner_screen(n_str, random_status, smart_status):
                 if scan_result_smart == "INIT":
                     scan_result_smart = miner_element.scan(grid)
                     scan_ctr_int += 1
+                elif scan_result_smart == "EMPTY" and smart_rotate_count == 4:
+                    miner_element.moveMiner(grid)
+                    trueGrid = generateGridSquares(grid)
+                    move_ctr_int += 1
+                    smart_rotate_count = 0
                 elif scan_result_smart == "EMPTY" and smart_rotate_count != 4:
                     miner_element.rotateDirection()
                     rotate_ctr_int += 1
                     smart_rotate_count += 1
                     scan_result_smart = miner_element.scan(grid)
                     scan_ctr_int += 1
-                elif scan_result_smart == "EMPTY" and smart_rotate_count == 4:
-                    miner_element.moveMiner(grid)
-                    trueGrid = generateGridSquares(grid)
-                    move_ctr_int += 1
-                    smart_rotate_count = 0
-                elif scan_result_smart == "PIT":
+                elif scan_result_smart == "PIT" or scan_result_smart == "PREV":
                     miner_element.rotateDirection()
                     rotate_ctr_int += 1
                     scan_result_smart = miner_element.scan(grid)
                     scan_ctr_int += 1
                     smart_rotate_count += 1
-                elif scan_result_smart == "GOLD":
+                elif scan_result_smart == "GOLD" or scan_result_smart == "BEACON":
                     miner_element.moveMiner(grid)
                     trueGrid = generateGridSquares(grid)
                     move_ctr_int += 1
-                elif scan_result_smart == "BEACON":
-                    miner_element.moveMiner(grid)
-                    trueGrid = generateGridSquares(grid)
-                    move_ctr_int += 1
-                elif scan_result_smart == "PREV":
-                    miner_element.rotateDirection()
-                    rotate_ctr_int += 1
-                    smart_rotate_count += 1
 
         else:
             if miner_dead:
@@ -582,6 +570,10 @@ def miner_screen(n_str, random_status, smart_status):
             elif miner_won:
                 end_message = font_dashboard.render("Congratulations!", True, (255, 165, 0))
                 screen.blit(end_message, (320 - end_message.get_width() // 2, ((box_margin + box_size) * n + box_margin) + 30))
+
+        if grid[miner_element.getPosition()[0]][miner_element.getPosition()[1]] == "BEACON":
+            beacon_hint = find_gold(grid, miner_element.getPosition()[0], miner_element.getPosition()[1], n)
+            beacon_result = str(beacon_hint)
 
         pygame.display.flip()
 
