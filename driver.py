@@ -538,30 +538,37 @@ def miner_screen(n_str, random_status, smart_status):
                 scan_ctr_int += 1
 
         elif algo == "SMART" and not miner_status and pace != "NONE": #Smart Algorithm (Greedy)
-                if scan_result_smart == "INIT":
-                    scan_result_smart = miner_element.scan(grid)
-                    scan_ctr_int += 1
-                elif scan_result_smart == "EMPTY" and smart_rotate_count == 4:
-                    miner_element.moveMiner(grid)
-                    trueGrid = generateGridSquares(grid)
-                    move_ctr_int += 1
-                    smart_rotate_count = 0
-                elif scan_result_smart == "EMPTY" and smart_rotate_count != 4:
+            if scan_result_smart == "INIT":
+                scan_result_smart = miner_element.scan(grid)
+                scan_ctr_int += 1
+            elif grid[miner_element.getPosition()[0]][miner_element.getPosition()[1]] == "BEACON" and scan_result_smart != "GOLD":
+                scan_result_smart = miner_element.scan(grid)
+                scan_ctr_int += 1
+                if scan_result_smart != "GOLD":
                     miner_element.rotateDirection()
                     rotate_ctr_int += 1
                     smart_rotate_count += 1
-                    scan_result_smart = miner_element.scan(grid)
-                    scan_ctr_int += 1
-                elif scan_result_smart == "PIT" or scan_result_smart == "PREV":
-                    miner_element.rotateDirection()
-                    rotate_ctr_int += 1
-                    scan_result_smart = miner_element.scan(grid)
-                    scan_ctr_int += 1
-                    smart_rotate_count += 1
-                elif scan_result_smart == "GOLD" or scan_result_smart == "BEACON":
-                    miner_element.moveMiner(grid)
-                    trueGrid = generateGridSquares(grid)
-                    move_ctr_int += 1
+            elif scan_result_smart == "EMPTY" and smart_rotate_count == 4:
+                miner_element.moveMiner(grid)
+                trueGrid = generateGridSquares(grid)
+                move_ctr_int += 1
+                smart_rotate_count = 0
+            elif scan_result_smart == "EMPTY" and smart_rotate_count != 4:
+                miner_element.rotateDirection()
+                rotate_ctr_int += 1
+                smart_rotate_count += 1
+                scan_result_smart = miner_element.scan(grid)
+                scan_ctr_int += 1
+            elif scan_result_smart == "PIT" or scan_result_smart == "PREV":
+                miner_element.rotateDirection()
+                rotate_ctr_int += 1
+                scan_result_smart = miner_element.scan(grid)
+                scan_ctr_int += 1
+                smart_rotate_count += 1
+            elif scan_result_smart == "GOLD" or scan_result_smart == "BEACON":
+                miner_element.moveMiner(grid)
+                trueGrid = generateGridSquares(grid)
+                move_ctr_int += 1
 
         else:
             if miner_dead:
