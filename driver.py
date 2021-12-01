@@ -373,6 +373,10 @@ def miner_screen(n_str, random_status, smart_status):
     miner_won = False
     grid = generateGrid(n)
     trueGrid = generateGridSquares(grid)
+
+    scan_result_smart = "INIT"
+    smart_rotate_count = 0
+
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -540,6 +544,41 @@ def miner_screen(n_str, random_status, smart_status):
                 if scan_result == "PREV":
                     scan_result = "EMPTY"
                 scan_ctr_int += 1
+
+        elif algo == "SMART" and not miner_status and pace != "NONE": #Smart Algorithm (Greedy)
+                if scan_result_smart == "INIT":
+                    scan_result_smart = miner_element.scan(grid)
+                    scan_ctr_int += 1
+                elif scan_result_smart == "EMPTY" and smart_rotate_count != 4:
+                    miner_element.rotateDirection()
+                    rotate_ctr_int += 1
+                    smart_rotate_count += 1
+                    scan_result_smart = miner_element.scan(grid)
+                    scan_ctr_int += 1
+                elif scan_result_smart == "EMPTY" and smart_rotate_count == 4:
+                    miner_element.moveMiner(grid)
+                    trueGrid = generateGridSquares(grid)
+                    move_ctr_int += 1
+                    smart_rotate_count = 0
+                elif scan_result_smart == "PIT":
+                    miner_element.rotateDirection()
+                    rotate_ctr_int += 1
+                    scan_result_smart = miner_element.scan(grid)
+                    scan_ctr_int += 1
+                    smart_rotate_count += 1
+                elif scan_result_smart == "GOLD":
+                    miner_element.moveMiner(grid)
+                    trueGrid = generateGridSquares(grid)
+                    move_ctr_int += 1
+                elif scan_result_smart == "BEACON":
+                    miner_element.moveMiner(grid)
+                    trueGrid = generateGridSquares(grid)
+                    move_ctr_int += 1
+                elif scan_result_smart == "PREV":
+                    miner_element.rotateDirection()
+                    rotate_ctr_int += 1
+                    smart_rotate_count += 1
+
         else:
             if miner_dead:
                 end_message = font_dashboard.render("Game Over!", True, (255, 0, 0))
