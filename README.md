@@ -1,15 +1,5 @@
 # CSINTSY-MCO1-Miner
 
-## Division of Tasks
-### Bernice Betito
-- [ ] GUI
+An intelligent agent that simulates a Miner who tries to find a pot of gold while avoiding pits on a rectangular grid of n x n squares.
 
-### Methuselah De la Cerna
-- [ ] Search Algo
-
-### Aaron Guarnes
-- [ ] Search Algo
-
-### Luis Valera
-- [x] Grid Generation
-- [x] Miner and Grid Square Classes
+To run, enter `python driver.py` through command line.
