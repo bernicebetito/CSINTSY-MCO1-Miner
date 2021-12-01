@@ -83,46 +83,50 @@ def find_gold(grid, currentRow, currentCol, n):
     beacon_list = []
 
     # Search Top
-    tempRow = currentRow - 1
+    tempRow = currentRow
+    row_ctr = 0
     while tempRow >= 0:
+        row_ctr += 1
+        beacon_top = row_ctr
         if grid[tempRow][currentCol] == "GOLD":
-            beacon_top = tempRow
             tempRow = -1
         tempRow -= 1
-    beacon_top = tempRow
     if beacon_top > 0:
         beacon_list.append(beacon_top)
 
     # Seacrh Bottom
-    tempRow = currentRow + 1
+    tempRow = currentRow
+    row_ctr = 0
     while tempRow < n:
+        row_ctr += 1
+        beacon_bottom = row_ctr
         if grid[tempRow][currentCol] == "GOLD":
-            beacon_bottom = tempRow
             tempRow = n
         tempRow += 1
-    beacon_bottom = tempRow
     if beacon_bottom > 0:
         beacon_list.append(beacon_bottom)
 
     # Search Right
-    tempCol = currentCol + 1
+    tempCol = currentCol
+    col_ctr = 0
     while tempCol < n:
+        col_ctr += 1
+        beacon_right = col_ctr
         if grid[currentRow][tempCol] == "GOLD":
-            beacon_right = tempCol
             tempCol = n
         tempCol += 1
-    beacon_right = tempCol
     if beacon_right > 0:
         beacon_list.append(beacon_right)
 
     # Search Left
-    tempCol = currentCol - 1
+    tempCol = currentCol
+    col_ctr = 0
     while tempCol >= 0:
+        col_ctr += 1
+        beacon_left = col_ctr
         if grid[currentRow][tempCol] == "GOLD":
-            beacon_left = tempCol
             tempCol = -1
         tempCol -= 1
-    beacon_left = tempCol
     if beacon_left > 0:
         beacon_list.append(beacon_left)
 
