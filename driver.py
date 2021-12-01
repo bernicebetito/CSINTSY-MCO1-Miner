@@ -545,9 +545,14 @@ def miner_screen(n_str, random_status, smart_status):
                 scan_result_smart = miner_element.scan(grid)
                 scan_ctr_int += 1
                 if scan_result_smart != "GOLD":
-                    miner_element.rotateDirection()
-                    rotate_ctr_int += 1
-                    smart_rotate_count += 1
+                    if scan_result_smart == "BEACON":
+                        miner_element.moveMiner(grid)
+                        trueGrid = generateGridSquares(grid)
+                        move_ctr_int += 1
+                    else:
+                        miner_element.rotateDirection()
+                        rotate_ctr_int += 1
+                        smart_rotate_count += 1
             elif scan_result_smart == "EMPTY" and smart_rotate_count == 4:
                 miner_element.moveMiner(grid)
                 trueGrid = generateGridSquares(grid)
